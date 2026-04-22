@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cap Vert CvBoard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f6f8;
+  --w: #fff;
+  --sb: #16202e;
+  --sb2: #1e2d3f;
+  --blue: #3b7aff;
+  --blue-soft: #eef3ff;
+  --green: #12a05c;
+  --green-soft: #edfaf4;
+  --amber: #e08c1a;
+  --amber-soft: #fff8ec;
+  --red: #e5484d;
+  --red-soft: #fff5f5;
+  --t1: #16202e;
+  --t2: #394452;
+  --t3: #718096;
+  --t4: #a8b5c4;
+  --border: #eaecf0;
+  --border2: #f4f5f7;
+  --r: 14px;
+  --r2: 16px;
+  --sh: 0 1px 4px rgba(22,32,46,0.06);
+  --sh2: 0 6px 20px rgba(22,32,46,0.1);
+  --f: 'Geist', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--f);background:var(--bg);color:var(--t1);font-size:13px;display:flex;}
+
+/* ── SIDEBAR ── */
+nav{
+  width:54px;
+  background:linear-gradient(160deg,#1a4a32 0%,#163660 100%);
+  height:100vh;display:flex;flex-direction:column;
+  flex-shrink:0;transition:width 0.22s ease;overflow:hidden;
+}
+nav:hover{width:230px;}
+.nb{
+  padding:12px 12px;height:54px;
+  display:flex;align-items:center;gap:9px;
+  border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;
+}
+.nb-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,#4ade80,#3b7aff);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(59,122,255,0.35);
+}
+.nb-mark i{color:white;font-size:12px;}
+.nb-name{font-size:14px;font-weight:700;color:white;letter-spacing:-0.02em;white-space:nowrap;opacity:0;transition:opacity 0.15s 0.05s;}
+.nb-name em{color:#4ade80;font-style:normal;}
+nav:hover .nb-name{opacity:1;}
+
+.ns{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 8px;scrollbar-width:none;}
+.ns::-webkit-scrollbar{display:none;}
+
+.nsect{font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:10px 8px 4px;white-space:nowrap;opacity:0;transition:opacity 0.15s;}
+nav:hover .nsect{opacity:1;}
+
+.ni{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:8px;height:36px;
+  font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.42);
+  cursor:pointer;margin-bottom:1px;transition:all 0.12s;position:relative;white-space:nowrap;
+}
+.ni i.icon{width:16px;text-align:center;font-size:13px;flex-shrink:0;}
+.ni .label{opacity:0;transition:opacity 0.12s;}
+.ni .np{margin-left:auto;font-size:9.5px;font-weight:700;background:var(--blue);color:white;border-radius:20px;padding:1px 6px;opacity:0;transition:opacity 0.12s;}
+nav:hover .ni .label{opacity:1;}
+nav:hover .ni .np{opacity:1;}
+.ni:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.78);}
+.ni.on{background:rgba(255,255,255,0.12);color:white;font-weight:600;}
+.ni.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:#4ade80;border-radius:0 2px 2px 0;}
+
+.ng{margin-bottom:2px;}
+.ng-head{
+  display:flex;align-items:center;gap:9px;height:36px;
+  padding:8px 10px;border-radius:8px;
+  font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.42);
+  cursor:pointer;transition:all 0.12s;white-space:nowrap;
+}
+.ng-head i.icon{width:16px;text-align:center;font-size:13px;flex-shrink:0;}
+.ng-head .label{opacity:0;transition:opacity 0.12s;}
+.ng-head .np{font-size:9.5px;font-weight:700;background:var(--blue);color:white;border-radius:20px;padding:1px 6px;opacity:0;transition:opacity 0.12s;}
+.ng-arrow{margin-left:auto;font-size:9px;color:rgba(255,255,255,0.3);transition:transform 0.2s;opacity:0;}
+nav:hover .ng-head .label{opacity:1;}
+nav:hover .ng-head .np{opacity:1;}
+nav:hover .ng-arrow{opacity:1;}
+.ng-head:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);}
+.ng-head.open .ng-arrow{transform:rotate(90deg);}
+.ng-body{display:none;padding-left:14px;margin-top:1px;}
+.ng-body.open{display:block;}
+.ng-item{
+  display:flex;align-items:center;gap:8px;height:34px;
+  padding:7px 10px;border-radius:8px;
+  font-size:12px;font-weight:500;color:rgba(255,255,255,0.38);
+  cursor:pointer;margin-bottom:1px;transition:all 0.12s;position:relative;white-space:nowrap;
+}
+.ng-item i{width:14px;text-align:center;font-size:11px;flex-shrink:0;}
+.ng-item .label{opacity:0;transition:opacity 0.12s;}
+nav:hover .ng-item .label{opacity:1;}
+.ng-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);}
+.ng-item.on{color:white;font-weight:600;background:rgba(255,255,255,0.1);}
+.ng-item.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:2px;height:14px;background:#4ade80;border-radius:0 2px 2px 0;}
+
+.nbot{padding:12px 8px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;}
+.nu{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background 0.12s;white-space:nowrap;}
+.nu:hover{background:rgba(255,255,255,0.07);}
+.nav-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#3b7aff);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+.nu-info{opacity:0;transition:opacity 0.12s;}
+nav:hover .nu-info{opacity:1;}
+.nu-name{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);}
+.nu-role{font-size:10px;color:rgba(255,255,255,0.3);}
+
+/* ── MAIN ── */
+main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0;}
+.tb{background:var(--w);border-bottom:1px solid var(--border);padding:0 22px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tb-l{display:flex;align-items:center;gap:8px;}
+.tb-title{font-size:14px;font-weight:700;color:var(--t1);}
+.tb-sep{color:var(--t4);font-size:10px;}
+.tb-sub{font-size:13px;color:var(--t3);font-weight:500;}
+.tb-r{display:flex;align-items:center;gap:8px;}
+.tb-date{font-size:11.5px;color:var(--t3);font-weight:500;background:var(--bg);padding:5px 11px;border-radius:20px;}
+
+.sc{flex:1;overflow-y:auto;padding:20px 22px;}
+.pg{display:none;}
+.pg.on{display:block;}
+
+/* ── ACCUEIL ── */
+.welcome{
+  background:linear-gradient(135deg,#4ade80,#3b7aff);
+  border-radius:var(--r2);padding:20px 24px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  overflow:hidden;position:relative;
+}
+.welcome::after{content:'';position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;}
+.wlc-greeting{font-size:17px;font-weight:700;color:white;letter-spacing:-0.02em;}
+.wlc-sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:3px;}
+.wlc-kpis{display:flex;align-items:center;gap:0;position:relative;z-index:1;}
+.wlc-kpi{padding:0 22px;text-align:center;}
+.wlc-kpi-val{font-size:28px;font-weight:800;color:white;line-height:1;}
+.wlc-kpi-lbl{font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px;}
+.wlc-sep{width:1px;background:rgba(255,255,255,0.3);height:36px;align-self:center;}
+.home-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.card{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden;}
+.ch{padding:12px 15px;display:flex;align-items:center;gap:9px;border-bottom:2px solid var(--border2);}
+.ch.gms{border-bottom-color:#dbeafe;}
+.ch.sol{border-bottom-color:#d1fae5;}
+.ch-ic{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0;}
+.ch-title{font-size:13px;font-weight:700;color:var(--t1);flex:1;}
+.ch-tag{font-size:10.5px;font-weight:600;color:var(--t3);background:var(--bg);padding:2px 9px;border-radius:20px;}
+.cb{padding:8px;}
+.dsep{display:flex;align-items:center;gap:8px;padding:6px 9px 3px;}
+.dsl{font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--t4);}
+.dsl-line{flex:1;height:1px;background:var(--border2);}
+.dsl-n{font-size:9.5px;font-weight:700;color:var(--t4);}
+.ir{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:background 0.1s;}
+.ir:hover{background:var(--bg);}
+.eq{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0;}
+.eq.b{background:var(--blue-soft);color:var(--blue);}
+.eq.g{background:var(--green-soft);color:var(--green);}
+.ib{flex:1;min-width:0;}
+.in{font-size:12.5px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ia{font-size:11px;color:var(--t4);margin-top:1px;}
+.ist{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+.ist.done{background:#d1fae5;color:#047857;}
+.ist.prev{background:#fef3c7;color:#b45309;}
+.none2{font-size:11.5px;color:var(--t4);padding:7px 10px;}
+
+/* ══════════════════════════════
+   PLANNING — PLEIN ÉCRAN
+══════════════════════════════ */
+.plan-wrap{display:flex;flex-direction:column;gap:0;}
+.plan-cal-bar{
+  background:var(--w);border:1px solid var(--border);border-bottom:none;
+  border-radius:var(--r2) var(--r2) 0 0;
+  padding:11px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.cn{display:flex;align-items:center;gap:4px;}
+.cnb{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:10px;transition:all 0.12s;}
+.cnb:hover{background:var(--sb);color:white;border-color:var(--sb);}
+.cp{font-size:13px;font-weight:700;color:var(--t1);padding:0 4px;}
+.vs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--border);}
+.vb{padding:4px 11px;border-radius:6px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--f);}
+.vb.on{background:var(--w);color:var(--t1);box-shadow:var(--sh);}
+.ck{margin-left:auto;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:8px;border:1px solid;}
+.ck.b{color:var(--blue);background:var(--blue-soft);border-color:#c7d9ff;}
+.ck.g{color:var(--green);background:var(--green-soft);border-color:#a7f3d0;}
+
+/* Grille semaine compacte */
+.wv{
+  background:var(--w);border:1px solid var(--border);
+  border-radius:0 0 var(--r2) var(--r2);flex:1;overflow:hidden;
+}
+.wvhd{display:grid;grid-template-columns:repeat(5,1fr);}
+.wvh{padding:10px 8px;text-align:center;border-right:1px solid var(--border2);}
+.wvh:last-child{border-right:none;}
+.wvh.tod{background:#eef3ff;}
+.wvhd2{font-size:9.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t4);}
+.wvnum{font-size:18px;font-weight:800;color:var(--t1);margin-top:2px;line-height:1;}
+.wvnum.t{display:inline-flex;width:30px;height:30px;background:var(--sb);color:white;border-radius:50%;align-items:center;justify-content:center;font-size:14px;margin-top:2px;}
+.wvca{font-size:9.5px;font-weight:600;color:var(--blue);margin-top:2px;}
+.wvbd{display:grid;grid-template-columns:repeat(5,1fr);}
+.wvc{padding:8px 7px;min-height:420px;overflow-y:auto;border-right:1px solid var(--border2);}
+.wvc:last-child{border-right:none;}
+.wvc.tod{background:#f6f9ff;}
+.we{padding:8px 10px;border-radius:9px;margin-bottom:5px;cursor:pointer;transition:all 0.12s;border-left:3px solid;}
+.we:hover{transform:translateY(-1px);box-shadow:var(--sh2);}
+.we.done{background:var(--green-soft);border-left-color:#6ee7b7;}
+.we.prev{background:var(--amber-soft);border-left-color:#fcd34d;}
+.we-n{font-size:11px;font-weight:600;color:var(--t1);line-height:1.3;}
+.we-f{display:flex;align-items:center;gap:4px;margin-top:4px;}
+.we-eq{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;}
+.we-eq.b{background:#dbeafe;color:#1d4ed8;}
+.we-eq.g{background:#d1fae5;color:#065f46;}
+.we-st{font-size:9px;font-weight:600;}
+.we.done .we-st{color:var(--green);}
+.we.prev .we-st{color:var(--amber);}
+.we-ca{font-size:9px;color:var(--t4);margin-left:auto;}
+.wmt{font-size:10.5px;color:var(--border);text-align:center;padding-top:20px;}
+
+/* VUE MOIS */
+.mv{background:var(--w);border:1px solid var(--border);border-radius:0 0 var(--r2) var(--r2);flex:1;overflow:hidden;}
+.mvwd{display:grid;grid-template-columns:repeat(5,1fr);background:var(--sb);}
+.mvwd div{text-align:center;padding:9px;font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.5);}
+.mwk{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);}
+.md{min-height:72px;padding:5px;border-right:1px solid var(--border2);cursor:pointer;transition:background 0.1s;}
+.md:last-child{border-right:none;}
+.md:hover{background:#fafbfc;}
+.md.tod{background:#eef3ff;}
+.md.om{background:#fafafa;}
+.mdn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;color:var(--t3);margin-bottom:2px;}
+.md.tod .mdn{background:var(--sb);color:white;font-weight:700;}
+.md.om .mdn{color:var(--t4);}
+.me{display:flex;align-items:center;gap:3px;padding:2px 4px;border-radius:4px;margin-bottom:2px;border-left:2px solid;}
+.me.done{background:var(--green-soft);border-left-color:#6ee7b7;}
+.me.prev{background:var(--amber-soft);border-left-color:#fcd34d;}
+.me-n{font-size:9px;font-weight:600;color:var(--t1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.me-t{font-size:8.5px;font-weight:700;color:var(--t3);}
+.me-more{font-size:9px;font-weight:700;color:var(--blue);}
+
+/* ══════════════════════════════
+   CHANTIERS — CARD GRID
+══════════════════════════════ */
+.ch-top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.ch-top-bar-t{font-size:16px;font-weight:700;color:var(--t1);}
+.ch-top-bar-t span{font-size:12px;font-weight:500;color:var(--t4);}
+.btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--f);transition:all 0.15s;}
+.btn-p{background:var(--sb);color:white;}
+.btn-p:hover{opacity:.9;}
+.btn-g{background:var(--green);color:white;}
+.btn-g:hover{opacity:.9;}
+.btn-s{background:var(--w);color:var(--t2);border:1px solid var(--border);}
+.btn-s:hover{background:var(--bg);}
+.btn-s.on{background:var(--blue-soft);color:var(--blue);border-color:#c7d9ff;}
+.filt{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.fi{padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:var(--w);font-size:12px;color:var(--t1);font-family:var(--f);outline:none;}
+.fi:focus{border-color:var(--blue);}
+.fi::placeholder{color:var(--t4);}
+
+/* Grille de cartes chantier */
+.chantier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.chantier-card{
+  background:var(--w);border-radius:var(--r2);border:1px solid var(--border);
+  box-shadow:var(--sh);cursor:pointer;transition:all 0.15s;overflow:hidden;
+}
+.chantier-card:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
+.cc-head{
+  padding:13px 15px 11px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:10px;
+}
+.cc-name{font-size:13px;font-weight:700;color:var(--t1);line-height:1.35;}
+.cc-addr{font-size:11px;color:var(--t4);margin-top:2px;}
+.cc-st{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-top:2px;}
+.cc-st.ok{background:#d1fae5;color:#047857;}
+.cc-st.ko{background:var(--red-soft);color:var(--red);}
+.cc-body{padding:11px 15px;display:flex;flex-direction:column;gap:7px;}
+.cc-row{display:flex;align-items:center;justify-content:space-between;}
+.cc-lbl{font-size:10.5px;color:var(--t3);}
+.cc-val{font-size:11.5px;font-weight:600;color:var(--t1);}
+.cc-val.blue{color:var(--blue);}
+.cc-val.green{color:var(--green);}
+.cc-foot{
+  padding:9px 15px;border-top:1px solid var(--border2);
+  display:flex;align-items:center;gap:7px;
+}
+.cc-eq{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;}
+.cc-eq.b{background:var(--blue-soft);color:var(--blue);}
+.cc-eq.g{background:var(--green-soft);color:var(--green);}
+.cc-next{font-size:10.5px;color:var(--t3);margin-left:auto;}
+.cc-next strong{color:var(--t1);}
+
+/* Pagination */
+.pag{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.pag-info{font-size:11px;color:var(--t4);}
+
+/* ── RAPPORTS ── */
+.rl{display:flex;flex-direction:column;gap:8px;}
+.rc{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);padding:12px 16px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.12s;}
+.rc:hover{box-shadow:var(--sh2);}
+.ri{width:33px;height:33px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ri.b{background:var(--blue-soft);color:var(--blue);}
+.ri.g{background:var(--green-soft);color:var(--green);}
+.ri2{flex:1;min-width:0;}
+.rn{font-size:12.5px;font-weight:600;color:var(--t1);}
+.rm{font-size:10.5px;color:var(--t4);margin-top:2px;}
+.rr{text-align:right;flex-shrink:0;}
+.rd{font-size:10.5px;color:var(--t4);}
+.rl3{font-size:11px;font-weight:600;color:var(--blue);margin-top:3px;display:flex;align-items:center;gap:3px;justify-content:flex-end;}
+
+/* ── COLLAB ── */
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.ccc{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);padding:15px;box-shadow:var(--sh);cursor:pointer;transition:all 0.15s;}
+.ccc:hover{box-shadow:var(--sh2);transform:translateY(-1px);}
+.ccc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.ccc-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#3b7aff);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+.ccc-n{font-size:12.5px;font-weight:600;color:var(--t1);}
+.ccc-l{font-size:10.5px;color:var(--t4);}
+.tg{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;}
+.tg.b{background:var(--blue-soft);color:var(--blue);}
+.tg.g{background:var(--green-soft);color:var(--green);}
+.tg.a{background:var(--amber-soft);color:var(--amber);}
+.tg.n{background:var(--bg);color:var(--t3);border:1px solid var(--border);}
+
+/* ── FRANCHISES ── */
+.fs{font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);margin:14px 0 10px;display:flex;align-items:center;gap:8px;}
+.fs-ic{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.fs::after{content:'';flex:1;height:1px;background:var(--border);}
+.fg{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.fc{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:var(--sh);cursor:pointer;transition:all 0.15s;}
+.fc:hover{box-shadow:var(--sh2);transform:translateY(-1px);}
+.fci{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.fcn{font-size:11.5px;font-weight:600;color:var(--t1);text-align:center;}
+.fcc{font-size:10px;color:var(--t4);}
+
+/* ── PARAMS ── */
+.pl{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);overflow:hidden;box-shadow:var(--sh);}
+.pr{display:flex;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border2);gap:14px;}
+.pr:last-child{border-bottom:none;}
+.prl{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.prs2{font-size:11px;color:var(--t4);margin-top:2px;}
+.pri{padding:7px 11px;border-radius:8px;border:1px solid var(--border);font-size:12px;font-family:var(--f);color:var(--t1);width:220px;outline:none;}
+.pri:focus{border-color:var(--blue);}
+.prsv{padding:7px 14px;border-radius:8px;background:var(--sb);color:white;font-size:11.5px;font-weight:600;border:none;cursor:pointer;font-family:var(--f);}
+
+/* ── DONNÉES ── */
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.dc{background:var(--w);border-radius:var(--r2);border:1px solid var(--border);padding:18px;box-shadow:var(--sh);}
+.di{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:11px;}
+.dv{font-size:26px;font-weight:800;color:var(--t1);}
+.dl{font-size:11.5px;color:var(--t3);margin-top:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav>
+  <div class="nb">
+    <div class="nb-mark"><i class="fa-solid fa-leaf"></i></div>
+    <div class="nb-name">Cap <em>Vert</em></div>
+  </div>
+  <div class="ns">
+
+    <!-- Accueil -->
+    <div class="ni on" onclick="go('accueil',this,'Accueil','Vue d\'ensemble')"><i class="fa-solid fa-house icon"></i><span class="label"> Accueil</span></div>
+
+    <!-- Planning dépliable -->
+    <div class="ng">
+      <div class="ng-head" onclick="toggleGroup(this)">
+        <i class="fa-regular fa-calendar-days icon"></i>
+        <span class="label">Planning</span>
+        <span class="np">7</span>
+        <i class="fa-solid fa-chevron-right ng-arrow"></i>
+      </div>
+      <div class="ng-body open">
+        <div class="ng-item on" onclick="go('pgms',this,'Planning GMS','Semaine du 21 au 25 avril')"><i class="fa-solid fa-gas-pump"></i><span class="label"> GMS</span></div>
+        <div class="ng-item" onclick="go('psol',this,'Planning Solaire','Semaine du 21 au 25 avril')"><i class="fa-solid fa-solar-panel"></i><span class="label"> Solaire</span></div>
+      </div>
+    </div>
+
+    <!-- Chantiers dépliable -->
+    <div class="ng">
+      <div class="ng-head" onclick="toggleGroup(this)">
+        <i class="fa-solid fa-hammer icon"></i>
+        <span class="label">Chantiers</span>
+        <i class="fa-solid fa-chevron-right ng-arrow"></i>
+      </div>
+      <div class="ng-body">
+        <div class="ng-item" onclick="go('cgms',this,'Chantiers GMS','426 chantiers actifs')"><i class="fa-solid fa-store"></i><span class="label"> GMS</span></div>
+        <div class="ng-item" onclick="go('csol',this,'Chantiers Solaire','54 chantiers actifs')"><i class="fa-solid fa-bolt"></i><span class="label"> Solaire</span></div>
+      </div>
+    </div>
+
+    <div class="ni" onclick="go('raps',this,'Rapports','Comptes-rendus d\'intervention')"><i class="fa-regular fa-file-lines icon"></i><span class="label"> Rapports</span></div>
+
+    <div class="nsect">Admin</div>
+    <div class="ni" onclick="go('colls',this,'Collaborateurs','13 membres')"><i class="fa-solid fa-users icon"></i><span class="label"> Collaborateurs</span></div>
+    <div class="ni" onclick="go('francs',this,'Franchises','22 partenaires')"><i class="fa-solid fa-building icon"></i><span class="label"> Franchises</span></div>
+    <div class="ni" onclick="go('params',this,'Paramètres','Configuration')"><i class="fa-solid fa-sliders icon"></i><span class="label"> Paramètres</span></div>
+    <div class="ni" onclick="go('data',this,'Données','Base de données')"><i class="fa-solid fa-database icon"></i><span class="label"> Données</span></div>
+
+  </div>
+  <div class="nbot">
+    <div class="nu">
+      <div class="nav-av">LA</div>
+      <div class="nu-info"><div class="nu-name">Laurent A.</div><div class="nu-role">Administrateur</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+  <div class="tb">
+    <div class="tb-l">
+      <div class="tb-title" id="tt">Accueil</div>
+      <span class="tb-sep"><i class="fa-solid fa-chevron-right"></i></span>
+      <div class="tb-sub" id="ts">Vue d'ensemble</div>
+    </div>
+    <div class="tb-r">
+      <div class="tb-date"><i class="fa-regular fa-calendar" style="margin-right:5px;opacity:.45"></i>Mardi 22 avril 2026</div>
+    </div>
+  </div>
+
+  <div class="sc">
+
+    <!-- ── ACCUEIL ── -->
+    <div class="pg on" id="pg-accueil">
+      <div class="welcome">
+        <div><div class="wlc-greeting">Bonjour, Laurent</div><div class="wlc-sub">Voici l'activité du jour · Semaine 17</div></div>
+        <div class="wlc-kpis">
+          <div class="wlc-kpi"><div class="wlc-kpi-val">7</div><div class="wlc-kpi-lbl">Aujourd'hui</div></div>
+          <div class="wlc-sep"></div>
+          <div class="wlc-kpi"><div class="wlc-kpi-val">5</div><div class="wlc-kpi-lbl">Terminées</div></div>
+          <div class="wlc-sep"></div>
+          <div class="wlc-kpi"><div class="wlc-kpi-val">3</div><div class="wlc-kpi-lbl">Demain</div></div>
+          <div class="wlc-sep"></div>
+          <div class="wlc-kpi"><div class="wlc-kpi-val">4</div><div class="wlc-kpi-lbl">Équipes</div></div>
+        </div>
+      </div>
+      <div class="home-cols">
+        <div class="card">
+          <div class="ch gms"><div class="ch-ic" style="background:#1d4ed8"><i class="fa-solid fa-gas-pump"></i></div><div class="ch-title">GMS</div><div class="ch-tag">3 aujourd'hui</div></div>
+          <div class="cb">
+            <div class="dsep"><span class="dsl">Hier</span><div class="dsl-line"></div></div>
+            <div class="none2">Aucune intervention</div>
+            <div class="dsep"><span class="dsl">Aujourd'hui</span><div class="dsl-line"></div><span class="dsl-n">3</span></div>
+            <div class="ir"><span class="eq b">G2</span><div class="ib"><div class="in">Garage Gayet</div><div class="ia">Gaillac</div></div><span class="ist done">terminée</span></div>
+            <div class="ir"><span class="eq b">G2</span><div class="ib"><div class="in">Gaillac distribution Leclerc</div><div class="ia">Gaillac</div></div><span class="ist done">terminée</span></div>
+            <div class="ir"><span class="eq b">G1</span><div class="ib"><div class="in">Chrisdan Super U</div><div class="ia">Toulouse</div></div><span class="ist prev">prévue</span></div>
+            <div class="dsep"><span class="dsl">Demain</span><div class="dsl-line"></div><span class="dsl-n">1</span></div>
+            <div class="ir"><span class="eq b">G2</span><div class="ib"><div class="in">Centrabel</div><div class="ia">Albi</div></div><span class="ist prev">prévue</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch sol"><div class="ch-ic" style="background:#0f9e5a"><i class="fa-solid fa-solar-panel"></i></div><div class="ch-title">Solaire</div><div class="ch-tag">2 aujourd'hui</div></div>
+          <div class="cb">
+            <div class="dsep"><span class="dsl">Hier</span><div class="dsl-line"></div></div>
+            <div class="none2">Aucune intervention</div>
+            <div class="dsep"><span class="dsl">Aujourd'hui</span><div class="dsl-line"></div><span class="dsl-n">2</span></div>
+            <div class="ir"><span class="eq g">S1</span><div class="ib"><div class="in">Ferme PV Auch</div><div class="ia">Auch · 2 400 m²</div></div><span class="ist done">terminée</span></div>
+            <div class="ir"><span class="eq g">S2</span><div class="ib"><div class="in">EDF Renewables Albi</div><div class="ia">Albi · 1 800 m²</div></div><span class="ist prev">prévue</span></div>
+            <div class="dsep"><span class="dsl">Demain</span><div class="dsl-line"></div><span class="dsl-n">2</span></div>
+            <div class="ir"><span class="eq g">S1</span><div class="ib"><div class="in">Vergnaud Solar</div><div class="ia">Montauban</div></div><span class="ist prev">prévue</span></div>
+            <div class="ir"><span class="eq g">S2</span><div class="ib"><div class="in">Cap Solaire Tarbes</div><div class="ia">Tarbes</div></div><span class="ist prev">prévue</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLANNING GMS ── -->
+    <div class="pg" id="pg-pgms">
+      <div class="plan-wrap">
+        <div class="plan-cal-bar">
+            <div class="cn"><button class="cnb"><i class="fa-solid fa-chevron-left"></i></button><div class="cp" id="gp">Semaine du 21 — 25 avril</div><button class="cnb"><i class="fa-solid fa-chevron-right"></i></button></div>
+            <div class="vs"><button class="vb on" onclick="sc('g','w',this)">Semaine</button><button class="vb" onclick="sc('g','m',this)">Mois</button></div>
+            <div class="ck b" id="gca">CA semaine : 4 820 €</div>
+          </div>
+          <div id="gwv" style="flex:1;display:flex;flex-direction:column;">
+            <div class="wv" style="flex:1;display:flex;flex-direction:column;">
+              <div class="wvhd">
+                <div class="wvh"><div class="wvhd2">Lun</div><div class="wvnum">21</div><div class="wvca">1 330 €</div></div>
+                <div class="wvh tod"><div class="wvhd2">Mar</div><div class="wvnum t">22</div><div class="wvca">820 €</div></div>
+                <div class="wvh"><div class="wvhd2">Mer</div><div class="wvnum">23</div><div class="wvca">310 €</div></div>
+                <div class="wvh"><div class="wvhd2">Jeu</div><div class="wvnum">24</div><div class="wvca">—</div></div>
+                <div class="wvh"><div class="wvhd2">Ven</div><div class="wvnum">25</div><div class="wvca">810 €</div></div>
+              </div>
+              <div class="wvbd" style="flex:1;">
+                <div class="wvc"><div class="we done"><div class="we-n">SEDIS Carrefour</div><div class="we-f"><span class="we-eq b">G1</span><span class="we-st">terminée</span><span class="we-ca">680 €</span></div></div><div class="we prev"><div class="we-n">Centrabel</div><div class="we-f"><span class="we-eq b">G2</span><span class="we-st">prévue</span><span class="we-ca">290 €</span></div></div><div class="we prev"><div class="we-n">Sogarda</div><div class="we-f"><span class="we-eq b">G1</span><span class="we-st">prévue</span><span class="we-ca">360 €</span></div></div></div>
+                <div class="wvc tod"><div class="we prev"><div class="we-n">Super U Albi</div><div class="we-f"><span class="we-eq b">G1</span><span class="we-st">prévue</span><span class="we-ca">440 €</span></div></div><div class="we prev"><div class="we-n">Intermarché Castres</div><div class="we-f"><span class="we-eq b">G2</span><span class="we-st">prévue</span><span class="we-ca">380 €</span></div></div></div>
+                <div class="wvc"><div class="we prev"><div class="we-n">Garage Labarthe</div><div class="we-f"><span class="we-eq b">G2</span><span class="we-st">prévue</span><span class="we-ca">310 €</span></div></div></div>
+                <div class="wvc"><div class="wmt">Aucune</div></div>
+                <div class="wvc"><div class="we prev"><div class="we-n">Intermarché Mazamet</div><div class="we-f"><span class="we-eq b">G1</span><span class="we-st">prévue</span><span class="we-ca">420 €</span></div></div><div class="we prev"><div class="we-n">Leclerc Mazamet</div><div class="we-f"><span class="we-eq b">G2</span><span class="we-st">prévue</span><span class="we-ca">390 €</span></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="gmv" style="display:none;flex:1;flex-direction:column;">
+            <div class="mv" style="flex:1;">
+              <div class="mvwd"><div>Lundi</div><div>Mardi</div><div>Mercredi</div><div>Jeudi</div><div>Vendredi</div></div>
+              <div class="mwk"><div class="md om"><div class="mdn">30</div></div><div class="md om"><div class="mdn">31</div></div><div class="md"><div class="mdn">1</div><div class="me done"><div class="me-n">Garage Gayet</div><div class="me-t">G2</div></div></div><div class="md"><div class="mdn">2</div><div class="me done"><div class="me-n">SEDIS</div><div class="me-t">G1</div></div></div><div class="md"><div class="mdn">3</div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">6</div><div class="me done"><div class="me-n">Super U Castres</div><div class="me-t">G2</div></div></div><div class="md"><div class="mdn">7</div></div><div class="md"><div class="mdn">8</div><div class="me done"><div class="me-n">Leclerc Gaillac</div><div class="me-t">G1</div></div><div class="me done"><div class="me-n">Centrabel</div><div class="me-t">G2</div></div></div><div class="md"><div class="mdn">9</div><div class="me done"><div class="me-n">Sogarda</div><div class="me-t">G1</div></div></div><div class="md"><div class="mdn">10</div><div class="me done"><div class="me-n">Chrisdan</div><div class="me-t">G2</div></div><span class="me-more">+1</span></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">13</div></div><div class="md"><div class="mdn">14</div><div class="me done"><div class="me-n">Intermarché Auch</div><div class="me-t">G1</div></div></div><div class="md"><div class="mdn">15</div><div class="me done"><div class="me-n">Super U Carcassonne</div><div class="me-t">G2</div></div></div><div class="md"><div class="mdn">16</div></div><div class="md"><div class="mdn">17</div><div class="me done"><div class="me-n">Leclerc Pamiers</div><div class="me-t">G1</div></div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">20</div></div><div class="md tod"><div class="mdn">21</div><div class="me prev"><div class="me-n">SEDIS</div><div class="me-t">G1</div></div><div class="me prev"><div class="me-n">Centrabel</div><div class="me-t">G2</div></div></div><div class="md"><div class="mdn">22</div><div class="me prev"><div class="me-n">Super U Albi</div><div class="me-t">G1</div></div></div><div class="md"><div class="mdn">23</div></div><div class="md"><div class="mdn">24</div><div class="me prev"><div class="me-n">Intermarché Castres</div><div class="me-t">G2</div></div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">27</div></div><div class="md"><div class="mdn">28</div></div><div class="md"><div class="mdn">29</div><div class="me prev"><div class="me-n">Super U Carcassonne</div><div class="me-t">G1</div></div></div><div class="md"><div class="mdn">30</div><div class="me prev"><div class="me-n">Garage Gayet</div><div class="me-t">G2</div></div></div><div class="md om"><div class="mdn">1</div></div></div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- ── PLANNING SOLAIRE ── -->
+    <div class="pg" id="pg-psol">
+      <div class="plan-wrap">
+        <div class="plan-cal-bar">
+            <div class="cn"><button class="cnb"><i class="fa-solid fa-chevron-left"></i></button><div class="cp" id="sp">Semaine du 21 — 25 avril</div><button class="cnb"><i class="fa-solid fa-chevron-right"></i></button></div>
+            <div class="vs"><button class="vb on" onclick="sc('s','w',this)">Semaine</button><button class="vb" onclick="sc('s','m',this)">Mois</button></div>
+            <div class="ck g" id="sca">Surface semaine : 6 200 m²</div>
+          </div>
+          <div id="swv" style="flex:1;display:flex;flex-direction:column;">
+            <div class="wv" style="flex:1;display:flex;flex-direction:column;">
+              <div class="wvhd" style="background:linear-gradient(to right,#14532d,#166534)">
+                <div class="wvh" style="border-right:1px solid rgba(255,255,255,0.12)"><div class="wvhd2" style="color:rgba(255,255,255,0.55)">Lun</div><div class="wvnum" style="color:white">21</div><div class="wvca" style="color:#4ade80">5 000 m²</div></div>
+                <div class="wvh tod" style="border-right:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07)"><div class="wvhd2" style="color:rgba(255,255,255,0.55)">Mar</div><div class="wvnum t" style="background:var(--green)">22</div></div>
+                <div class="wvh" style="border-right:1px solid rgba(255,255,255,0.12)"><div class="wvhd2" style="color:rgba(255,255,255,0.55)">Mer</div><div class="wvnum" style="color:white">23</div><div class="wvca" style="color:#4ade80">4 100 m²</div></div>
+                <div class="wvh" style="border-right:1px solid rgba(255,255,255,0.12)"><div class="wvhd2" style="color:rgba(255,255,255,0.55)">Jeu</div><div class="wvnum" style="color:white">24</div></div>
+                <div class="wvh"><div class="wvhd2" style="color:rgba(255,255,255,0.55)">Ven</div><div class="wvnum" style="color:white">25</div><div class="wvca" style="color:#4ade80">2 400 m²</div></div>
+              </div>
+              <div class="wvbd" style="flex:1;">
+                <div class="wvc"><div class="we done"><div class="we-n">EDF Renewables</div><div class="we-f"><span class="we-eq g">S2</span><span class="we-st">terminée</span><span class="we-ca">1 800 m²</span></div></div><div class="we prev"><div class="we-n">Vergnaud Solar</div><div class="we-f"><span class="we-eq g">S1</span><span class="we-st">prévue</span><span class="we-ca">3 200 m²</span></div></div></div>
+                <div class="wvc tod"><div class="wmt">Aucune</div></div>
+                <div class="wvc"><div class="we prev"><div class="we-n">Cap Solaire Tarbes</div><div class="we-f"><span class="we-eq g">S2</span><span class="we-st">prévue</span><span class="we-ca">4 100 m²</span></div></div></div>
+                <div class="wvc"><div class="wmt">Aucune</div></div>
+                <div class="wvc"><div class="we prev"><div class="we-n">Ferme PV Auch</div><div class="we-f"><span class="we-eq g">S1</span><span class="we-st">prévue</span><span class="we-ca">2 400 m²</span></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="smv" style="display:none;flex:1;flex-direction:column;">
+            <div class="mv" style="flex:1;">
+              <div class="mvwd" style="background:var(--green)"><div>Lundi</div><div>Mardi</div><div>Mercredi</div><div>Jeudi</div><div>Vendredi</div></div>
+              <div class="mwk"><div class="md om"><div class="mdn">30</div></div><div class="md om"><div class="mdn">31</div></div><div class="md"><div class="mdn">1</div><div class="me done"><div class="me-n">Ferme PV Auch</div><div class="me-t">S1</div></div></div><div class="md"><div class="mdn">2</div></div><div class="md"><div class="mdn">3</div><div class="me done"><div class="me-n">EDF Renewables</div><div class="me-t">S2</div></div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">6</div></div><div class="md"><div class="mdn">7</div><div class="me done"><div class="me-n">Vergnaud Solar</div><div class="me-t">S1</div></div></div><div class="md"><div class="mdn">8</div></div><div class="md"><div class="mdn">9</div><div class="me done"><div class="me-n">Cap Solaire</div><div class="me-t">S2</div></div></div><div class="md"><div class="mdn">10</div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">13</div><div class="me done"><div class="me-n">Photon Energy</div><div class="me-t">S2</div></div></div><div class="md"><div class="mdn">14</div></div><div class="md"><div class="mdn">15</div></div><div class="md"><div class="mdn">16</div></div><div class="md"><div class="mdn">17</div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">20</div></div><div class="md tod"><div class="mdn">21</div><div class="me done"><div class="me-n">EDF Renewables</div><div class="me-t">S2</div></div><div class="me prev"><div class="me-n">Vergnaud Solar</div><div class="me-t">S1</div></div></div><div class="md"><div class="mdn">22</div></div><div class="md"><div class="mdn">23</div><div class="me prev"><div class="me-n">Cap Solaire</div><div class="me-t">S2</div></div></div><div class="md"><div class="mdn">24</div></div></div>
+              <div class="mwk"><div class="md"><div class="mdn">27</div></div><div class="md"><div class="mdn">28</div><div class="me prev"><div class="me-n">Solar Ariège</div><div class="me-t">S1</div></div></div><div class="md"><div class="mdn">29</div></div><div class="md"><div class="mdn">30</div><div class="me prev"><div class="me-n">Photon Energy</div><div class="me-t">S2</div></div></div><div class="md om"><div class="mdn">1</div></div></div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- ── CHANTIERS GMS — card grid ── -->
+    <div class="pg" id="pg-cgms">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Chantiers GMS <span>426 chantiers</span></div><button class="btn btn-p"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
+      <div class="filt"><input class="fi" placeholder="Nom..." style="width:180px"><input class="fi" placeholder="Ville..." style="width:130px"><select class="fi" style="width:155px"><option>Toutes fréquences</option><option>Mensuelle</option><option>Bimestrielle</option></select><select class="fi" style="width:115px"><option>Tous statuts</option><option>Actif</option><option>Inactif</option></select><button class="btn btn-s" style="padding:7px 10px"><i class="fa-solid fa-rotate-left"></i></button></div>
+      <div class="chantier-grid">
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Garage Gayet</div><div class="cc-addr">116 Av Saint Exupery, Gaillac</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Mensuelle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">380 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">20/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G2</span><span class="cc-next">Prochain : <strong>20/05/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Gaillac distribution Leclerc</div><div class="cc-addr">Gaillac (81600)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Mensuelle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">420 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">20/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G2</span><span class="cc-next">Prochain : <strong>20/05/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Chrisdan Super U</div><div class="cc-addr">Toulouse (31000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Bimestrielle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">560 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">15/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G1</span><span class="cc-next">Prochain : <strong>15/06/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">SEDIS Carrefour</div><div class="cc-addr">Albi (81000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Mensuelle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">680 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">21/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G1</span><span class="cc-next">Prochain : <strong>21/05/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Station Service BP Toulouse</div><div class="cc-addr">Toulouse (31000)</div></div><div class="cc-st ko">inactif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Semestrielle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">920 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">10/03/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G2</span><span class="cc-next" style="color:var(--red)">Non planifié</span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Intermarché Auch</div><div class="cc-addr">Auch (32000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val blue">Mensuelle</span></div><div class="cc-row"><span class="cc-lbl">CA HT</span><span class="cc-val green">340 €</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">08/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq b">G1</span><span class="cc-next">Prochain : <strong>08/05/2026</strong></span></div></div>
+      </div>
+      <div class="pag"><span class="pag-info">1–6 sur 426</span><div style="display:flex;gap:4px"><button class="btn btn-s" style="padding:5px 9px"><i class="fa-solid fa-angles-left"></i></button><button class="btn btn-s" style="padding:5px 9px"><i class="fa-solid fa-angle-left"></i></button><button class="btn btn-s" style="padding:5px 9px"><i class="fa-solid fa-angle-right"></i></button><button class="btn btn-s" style="padding:5px 9px"><i class="fa-solid fa-angles-right"></i></button></div></div>
+    </div>
+
+    <!-- ── CHANTIERS SOLAIRE — card grid ── -->
+    <div class="pg" id="pg-csol">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Chantiers Solaire <span>54 chantiers</span></div><button class="btn btn-g"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
+      <div class="filt"><input class="fi" placeholder="Nom..." style="width:180px"><input class="fi" placeholder="Ville..." style="width:130px"><select class="fi" style="width:155px"><option>Toutes fréquences</option><option>Annuelle</option><option>Semestrielle</option></select><button class="btn btn-s" style="padding:7px 10px"><i class="fa-solid fa-rotate-left"></i></button></div>
+      <div class="chantier-grid">
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Ferme PV Auch</div><div class="cc-addr">Auch (32000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Surface</span><span class="cc-val blue">2 400 m²</span></div><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val">Bimestrielle</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">20/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq g">S1</span><span class="cc-next">Prochain : <strong>20/06/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">EDF Renewables Albi</div><div class="cc-addr">Albi (81000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Surface</span><span class="cc-val blue">1 800 m²</span></div><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val">Trimestrielle</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">21/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq g">S2</span><span class="cc-next">Prochain : <strong>21/07/2026</strong></span></div></div>
+        <div class="chantier-card"><div class="cc-head"><div><div class="cc-name">Vergnaud Solar</div><div class="cc-addr">Montauban (82000)</div></div><div class="cc-st ok">actif</div></div><div class="cc-body"><div class="cc-row"><span class="cc-lbl">Surface</span><span class="cc-val blue">3 200 m²</span></div><div class="cc-row"><span class="cc-lbl">Fréquence</span><span class="cc-val">Semestrielle</span></div><div class="cc-row"><span class="cc-lbl">Dernier nettoyage</span><span class="cc-val">15/04/2026</span></div></div><div class="cc-foot"><span class="cc-eq g">S1</span><span class="cc-next">Prochain : <strong>15/10/2026</strong></span></div></div>
+      </div>
+    </div>
+
+    <!-- ── RAPPORTS ── -->
+    <div class="pg" id="pg-raps">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Rapports</div><div style="display:flex;gap:8px"><button class="btn btn-s on" id="tbg" onclick="sr('g')"><i class="fa-solid fa-gas-pump"></i> GMS</button><button class="btn btn-s" id="tbs" onclick="sr('s')"><i class="fa-solid fa-solar-panel"></i> Solaire</button></div></div>
+      <div class="filt"><input class="fi" placeholder="Nom client..." style="width:200px"><input class="fi" placeholder="Équipe..." style="width:140px"></div>
+      <div class="rl" id="rg">
+        <div class="rc"><div class="ri b"><i class="fa-solid fa-gas-pump"></i></div><div class="ri2"><div class="rn">Garage Gayet</div><div class="rm">G2 · Gaillac · Mensuelle</div></div><div class="rr"><div class="rd">20/04/2026</div><div class="rl3"><i class="fa-solid fa-file-pdf"></i> Voir le rapport</div></div></div>
+        <div class="rc"><div class="ri b"><i class="fa-solid fa-gas-pump"></i></div><div class="ri2"><div class="rn">Gaillac distribution Leclerc</div><div class="rm">G2 · Gaillac · Mensuelle</div></div><div class="rr"><div class="rd">20/04/2026</div><div class="rl3"><i class="fa-solid fa-file-pdf"></i> Voir le rapport</div></div></div>
+        <div class="rc"><div class="ri b"><i class="fa-solid fa-gas-pump"></i></div><div class="ri2"><div class="rn">Chrisdan Super U</div><div class="rm">G1 · Toulouse · Bimestrielle</div></div><div class="rr"><div class="rd">15/04/2026</div><div class="rl3"><i class="fa-solid fa-file-pdf"></i> Voir le rapport</div></div></div>
+      </div>
+      <div class="rl" id="rs" style="display:none">
+        <div class="rc"><div class="ri g"><i class="fa-solid fa-solar-panel"></i></div><div class="ri2"><div class="rn">Ferme PV Auch</div><div class="rm">S1 · Auch · 2 400 m²</div></div><div class="rr"><div class="rd">20/04/2026</div><div class="rl3"><i class="fa-solid fa-file-pdf"></i> Voir le rapport</div></div></div>
+        <div class="rc"><div class="ri g"><i class="fa-solid fa-solar-panel"></i></div><div class="ri2"><div class="rn">EDF Renewables Albi</div><div class="rm">S2 · Albi · 1 800 m²</div></div><div class="rr"><div class="rd">21/04/2026</div><div class="rl3"><i class="fa-solid fa-file-pdf"></i> Voir le rapport</div></div></div>
+      </div>
+    </div>
+
+    <!-- ── COLLABORATEURS ── -->
+    <div class="pg" id="pg-colls">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Collaborateurs <span>13 membres</span></div><button class="btn btn-p"><i class="fa-solid fa-plus"></i> Nouveau</button></div>
+      <div class="cg">
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">QD</div><div><div class="ccc-n">Quentin Darré</div><div class="ccc-l">QuentinDarre</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">collaborateur</span><span class="tg n">GMS</span><span class="tg a">G2</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">LA</div><div><div class="ccc-n">Laurent Aussinhac</div><div class="ccc-l">laurentCaussinus</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">administrateur</span><span class="tg n">GMS</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">MF</div><div><div class="ccc-n">Marion Frankrache</div><div class="ccc-l">MarionFankrache</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">administrateur</span><span class="tg g">Solaire</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">SH</div><div><div class="ccc-n">Stéphane Harnay</div><div class="ccc-l">StephaneHarnay</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">collaborateur</span><span class="tg n">GMS</span><span class="tg a">G1</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">VS</div><div><div class="ccc-n">Vincent Santarossa</div><div class="ccc-l">VSantarossa</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">collaborateur</span><span class="tg g">Solaire</span><span class="tg a">S1</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">JI</div><div><div class="ccc-n">Jimmy</div><div class="ccc-l">Jimmy</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">administrateur</span><span class="tg n">GMS</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">FL</div><div><div class="ccc-n">Franck Labau</div><div class="ccc-l">FranckLabau</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">administrateur</span><span class="tg n">GMS</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">MH</div><div><div class="ccc-n">Myriam Huguet</div><div class="ccc-l">Myriam Huguet</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">administrateur</span><span class="tg g">Solaire</span></div></div>
+        <div class="ccc"><div class="ccc-top"><div class="ccc-av">JP</div><div><div class="ccc-n">Jean-Philippe Saura</div><div class="ccc-l">Jean-PhilippeSaura</div></div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tg b">collaborateur</span><span class="tg n">GMS</span><span class="tg a">G1</span></div></div>
+      </div>
+    </div>
+
+    <!-- ── FRANCHISES ── -->
+    <div class="pg" id="pg-francs">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Franchises <span>22 franchises</span></div></div>
+      <div class="fs"><div class="fs-ic" style="background:var(--blue-soft)"><i class="fa-solid fa-gas-pump" style="color:var(--blue);font-size:10px"></i></div>GMS <span style="font-size:11px;font-weight:500;color:var(--t4)">(14)</span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci" style="background:var(--blue-soft)"><i class="fa-solid fa-shopping-cart" style="color:var(--blue)"></i></div><div class="fcn">Intermarché</div><div class="fcc">62 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--blue-soft)"><i class="fa-solid fa-store" style="color:var(--blue)"></i></div><div class="fcn">Leclerc</div><div class="fcc">48 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--blue-soft)"><i class="fa-solid fa-building" style="color:var(--blue)"></i></div><div class="fcn">Super U</div><div class="fcc">37 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--blue-soft)"><i class="fa-solid fa-tag" style="color:var(--blue)"></i></div><div class="fcn">Carrefour</div><div class="fcc">29 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--blue-soft)"><i class="fa-solid fa-gas-pump" style="color:var(--blue)"></i></div><div class="fcn">Total</div><div class="fcc">18 sites</div></div>
+      </div>
+      <div class="fs" style="margin-top:18px"><div class="fs-ic" style="background:var(--green-soft)"><i class="fa-solid fa-solar-panel" style="color:var(--green);font-size:10px"></i></div>Solaire <span style="font-size:11px;font-weight:500;color:var(--t4)">(8)</span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci" style="background:var(--green-soft)"><i class="fa-solid fa-bolt" style="color:var(--green)"></i></div><div class="fcn">EDF Renewables</div><div class="fcc">12 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--green-soft)"><i class="fa-solid fa-sun" style="color:var(--green)"></i></div><div class="fcn">Engie Solar</div><div class="fcc">9 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--green-soft)"><i class="fa-solid fa-leaf" style="color:var(--green)"></i></div><div class="fcn">TotalEnergies</div><div class="fcc">7 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--green-soft)"><i class="fa-solid fa-seedling" style="color:var(--green)"></i></div><div class="fcn">Photon Energy</div><div class="fcc">5 sites</div></div>
+        <div class="fc"><div class="fci" style="background:var(--green-soft)"><i class="fa-solid fa-cloud-sun" style="color:var(--green)"></i></div><div class="fcn">Cap Solaire</div><div class="fcc">4 sites</div></div>
+      </div>
+    </div>
+
+    <!-- ── PARAMÈTRES ── -->
+    <div class="pg" id="pg-params">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Paramètres</div></div>
+      <div class="pl">
+        <div class="pr"><div><div class="prl">Email d'envoi des rapports</div><div class="prs2">Adresse de réception des comptes-rendus</div></div><input class="pri" value="rapports@capvert.fr"><button class="prsv">Sauvegarder</button></div>
+        <div class="pr"><div><div class="prl">Délai fréquence (jours)</div><div class="prs2">Intervalle entre deux interventions</div></div><input class="pri" value="30"><button class="prsv">Sauvegarder</button></div>
+        <div class="pr"><div><div class="prl">URL API mobile</div><div class="prs2">Endpoint de l'application mobile</div></div><input class="pri" value="https://server.cvert.net:5000"><button class="prsv">Sauvegarder</button></div>
+        <div class="pr"><div><div class="prl">Notification SMS</div><div class="prs2">Rappels envoyés aux équipes</div></div><input class="pri" value="activé"><button class="prsv">Sauvegarder</button></div>
+        <div class="pr"><div><div class="prl">Jours avant alerte</div><div class="prs2">Délai avant rappel intervention</div></div><input class="pri" value="7"><button class="prsv">Sauvegarder</button></div>
+        <div class="pr"><div><div class="prl">Timezone</div><div class="prs2">Fuseau horaire de référence</div></div><input class="pri" value="Europe/Paris"><button class="prsv">Sauvegarder</button></div>
+      </div>
+    </div>
+
+    <!-- ── DONNÉES ── -->
+    <div class="pg" id="pg-data">
+      <div class="ch-top-bar"><div class="ch-top-bar-t">Données</div></div>
+      <div class="dg">
+        <div class="dc"><div class="di" style="background:var(--blue-soft);color:var(--blue)"><i class="fa-solid fa-users"></i></div><div class="dv">1 142</div><div class="dl">Clients</div></div>
+        <div class="dc"><div class="di" style="background:var(--blue-soft);color:var(--blue)"><i class="fa-solid fa-gas-pump"></i></div><div class="dv">426</div><div class="dl">Chantiers GMS</div></div>
+        <div class="dc"><div class="di" style="background:var(--green-soft);color:var(--green)"><i class="fa-solid fa-solar-panel"></i></div><div class="dv">54</div><div class="dl">Chantiers Solaire</div></div>
+        <div class="dc"><div class="di" style="background:var(--blue-soft);color:var(--blue)"><i class="fa-solid fa-calendar-check"></i></div><div class="dv">2 734</div><div class="dl">Interventions GMS</div></div>
+        <div class="dc"><div class="di" style="background:var(--green-soft);color:var(--green)"><i class="fa-solid fa-calendar-check"></i></div><div class="dv">1 011</div><div class="dl">Interventions Solaire</div></div>
+        <div class="dc"><div class="di" style="background:var(--amber-soft);color:var(--amber)"><i class="fa-regular fa-file-lines"></i></div><div class="dv">1 873</div><div class="dl">Rapports GMS</div></div>
+        <div class="dc"><div class="di" style="background:var(--green-soft);color:var(--green)"><i class="fa-regular fa-file-lines"></i></div><div class="dv">864</div><div class="dl">Rapports Solaire</div></div>
+        <div class="dc"><div class="di" style="background:var(--bg);color:var(--t3)"><i class="fa-solid fa-id-card"></i></div><div class="dv">13</div><div class="dl">Collaborateurs</div></div>
+        <div class="dc"><div class="di" style="background:var(--amber-soft);color:var(--amber)"><i class="fa-solid fa-building"></i></div><div class="dv">22</div><div class="dl">Franchises</div></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+function toggleGroup(head) {
+  head.classList.toggle('open')
+  head.nextElementSibling.classList.toggle('open')
+}
+
+function go(id, el, t, s) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'))
+  document.querySelectorAll('.ni, .ng-item').forEach(i => i.classList.remove('on'))
+  document.getElementById('pg-' + id).classList.add('on')
+  el.classList.add('on')
+  document.getElementById('tt').textContent = t
+  document.getElementById('ts').textContent = s
+}
+
+function sc(c, v, btn) {
+  btn.closest('.vs').querySelectorAll('.vb').forEach(b => b.classList.remove('on'))
+  btn.classList.add('on')
+  const wvId = c === 'g' ? 'gwv' : 'swv'
+  const mvId = c === 'g' ? 'gmv' : 'smv'
+  const wv = document.getElementById(wvId)
+  const mv = document.getElementById(mvId)
+  const p = document.getElementById(c + 'p')
+  const ca = document.getElementById(c + 'ca')
+  if (v === 'w') {
+    wv.style.display = 'flex'; mv.style.display = 'none'
+    p.textContent = 'Semaine du 21 — 25 avril'
+    ca.textContent = c === 'g' ? '4 820 €' : '6 200 m²'
+  } else {
+    wv.style.display = 'none'; mv.style.display = 'flex'
+    p.textContent = 'Avril 2026'
+    ca.textContent = c === 'g' ? '18 420 €' : '24 600 m²'
+  }
+}
+
+function sr(t) {
+  document.getElementById('rg').style.display = t === 'g' ? 'flex' : 'none'
+  document.getElementById('rs').style.display = t === 's' ? 'flex' : 'none'
+  document.getElementById('tbg').classList.toggle('on', t === 'g')
+  document.getElementById('tbs').classList.toggle('on', t === 's')
+}
+</script>
+</body>
+</html>
