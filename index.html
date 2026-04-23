@@ -4,20 +4,64 @@
 <meta charset="UTF-8">
 <title>CvBoard — Maquettes</title>
 <style>
-  body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
-  .grid{display:flex;flex-direction:column;gap:12px;width:380px;}
-  h1{font-size:18px;font-weight:700;color:#16202e;margin-bottom:8px;}
-  a{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid #eaecf0;border-radius:12px;padding:16px 20px;text-decoration:none;color:#16202e;font-weight:600;font-size:14px;transition:box-shadow 0.15s;}
-  a:hover{box-shadow:0 4px 16px rgba(22,32,46,0.1);}
-  span{font-size:11px;color:#a8b5c4;font-weight:500;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:system-ui,sans-serif;background:#f5f6f8;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .wrap{width:440px;padding:20px;}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+  .brand-mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#4ade80,#3b7aff);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .brand-name{font-size:16px;font-weight:700;color:#16202e;}
+  .brand-name em{color:#12a05c;font-style:normal;}
+  h1{font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a8b5c4;margin-bottom:12px;}
+  .card{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid #eaecf0;border-radius:14px;padding:16px 20px;text-decoration:none;color:#16202e;margin-bottom:8px;transition:box-shadow 0.15s,transform 0.15s;}
+  .card:hover{box-shadow:0 4px 20px rgba(22,32,46,0.1);transform:translateY(-1px);}
+  .card.featured{border-color:#c7d9ff;background:linear-gradient(135deg,#f0f6ff,#ffffff);}
+  .card-left{}
+  .card-title{font-size:14px;font-weight:700;color:#16202e;}
+  .card-desc{font-size:11px;color:#a8b5c4;margin-top:3px;}
+  .badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;}
+  .badge-new{background:#dcfce7;color:#15803d;}
+  .badge-html{background:#f1f5f9;color:#64748b;}
+  .arrow{color:#a8b5c4;font-size:16px;}
 </style>
 </head>
 <body>
-<div class="grid">
-  <h1>CvBoard — Maquettes</h1>
-  <a href="maquette_v2b.html">Maquette V2b <span>Sidebar fixe · Bandeau gradient</span></a>
-  <a href="maquette_v3b.html">Maquette V3b <span>Sidebar hover · Menu dépliants</span></a>
-  <a href="maquette_v4.html">Maquette V4 <span>Sidebar 200px · Accueil 3 jours</span></a>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-mark">🌿</div>
+    <div class="brand-name">Cap <em>Vert</em> — Maquettes CvBoard</div>
+  </div>
+
+  <h1>Application complète</h1>
+  <a href="maquette-next" class="card featured">
+    <div class="card-left">
+      <div class="card-title">Maquette Next.js</div>
+      <div class="card-desc">App complète · Clients · Planning · 6 pages · Logo animé</div>
+    </div>
+    <span class="badge badge-new">NEW</span>
+  </a>
+
+  <h1 style="margin-top:20px">Variantes HTML</h1>
+  <a href="maquette_v2b.html" class="card">
+    <div class="card-left">
+      <div class="card-title">Maquette V2b</div>
+      <div class="card-desc">Sidebar fixe · Bandeau gradient · Accueil 2 colonnes</div>
+    </div>
+    <span class="badge badge-html">HTML</span>
+  </a>
+  <a href="maquette_v3b.html" class="card">
+    <div class="card-left">
+      <div class="card-title">Maquette V3b</div>
+      <div class="card-desc">Sidebar hover · Menu dépliants · Planning split</div>
+    </div>
+    <span class="badge badge-html">HTML</span>
+  </a>
+  <a href="maquette_v4.html" class="card">
+    <div class="card-left">
+      <div class="card-title">Maquette V4</div>
+      <div class="card-desc">Sidebar 200px · Accueil 3 jours · Chantiers cartes</div>
+    </div>
+    <span class="badge badge-html">HTML</span>
+  </a>
 </div>
 </body>
 </html>
